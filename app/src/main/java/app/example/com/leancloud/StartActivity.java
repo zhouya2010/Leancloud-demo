@@ -7,6 +7,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,7 +59,7 @@ public class StartActivity extends AppCompatActivity implements OnPageChangeList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
-
+        Log.d("StartActivity", "hello word");
         LinearLayout linearLayout = (LinearLayout)findViewById(R.id.viewGroup);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         mLoginTv = (TextView)findViewById(R.id.login_btn);
