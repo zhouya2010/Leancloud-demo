@@ -7,6 +7,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -113,6 +114,7 @@ public class StartActivity extends AppCompatActivity implements OnPageChangeList
                 loginDialog();
                 break;
             case R.id.register_btn:
+                registerDialog();
                 break;
             default:
                 break;
@@ -120,38 +122,38 @@ public class StartActivity extends AppCompatActivity implements OnPageChangeList
     }
 
 
-    void loginDialog() {
+    private  void  registerDialog() {
+        final View view = LayoutInflater.from(this).inflate(R.layout.activity_register, null);
+
+        final AlertDialog ad = new AlertDialog.Builder(this)
+                .setView(view)
+                .create();
+        ad.show();
+
+        TextView login_btn = (TextView) view.findViewById(R.id.register_Tx);
+        login_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attemptLogin(true, view, ad);
+            }
+        });
+    }
+
+    private void loginDialog() {
         final View view = LayoutInflater.from(this).inflate(R.layout.activity_login, null);
 
+        final AlertDialog ad = new AlertDialog.Builder(this)
+                .setView(view)
+                .create();
+        ad.show();
 
-//        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//            @Override
-//            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-//                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-//                    attemptLogin(true);
-//                    return true;
-//                }
-//                return false;
-//            }
-//        });
         TextView login_btn = (TextView) view.findViewById(R.id.login_Tx);
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                attemptLogin(true, view);
+                attemptLogin(true, view, ad);
             }
         });
-
-        AlertDialog ad = new AlertDialog.Builder(this)
-                .setView(view)
-//                .setPositiveButton("Log in", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//
-//                    }
-//                })
-                .create();
-        ad.show();
 
     }
 
@@ -213,7 +215,7 @@ public class StartActivity extends AppCompatActivity implements OnPageChangeList
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptLogin(boolean loginOrRegister, View view) {
+    private void attemptLogin(boolean loginOrRegister, View view, final AlertDialog ad) {
 
         mEmailView = (AutoCompleteTextView) view.findViewById(R.id.email);
 
@@ -261,9 +263,21 @@ public class StartActivity extends AppCompatActivity implements OnPageChangeList
                 AVUser.logInInBackground(email, password, new LogInCallback<AVUser>() {
                     @Override
                     public void done(AVUser avUser, AVException e) {
-                        if (e.getCode() == 211){
-                            Toast.makeText(StartActivity.this,  R.string.user_name_not_exist, Toast.LENGTH_SHORT).show();
+
+                        if (e != null) {
+                            Log.d("StartActivity", e.toString());
+                            if (e.getCode() == 211){
+                                Toast.makeText(StartActivity.this,  R.string.user_name_not_exist, Toast.LENGTH_SHORT).show();
+                            }
+                            else if (e.getCode() == 210) {
+                                Toast.makeText(StartActivity.this,  R.string.error_incorrect_password, Toast.LENGTH_SHORT).show();
+                            }
                         }
+                        else {
+                            ad.cancel();
+                            Log.d("StartActivity", avUser.getEmail());
+                        }
+
                     }
                 });
             }
