@@ -1,6 +1,9 @@
 package app.example.com.leancloud;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -25,6 +28,8 @@ import com.avos.avoscloud.SignUpCallback;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static app.example.com.leancloud.R.id.email;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -53,7 +58,10 @@ public class StartActivity extends AppCompatActivity implements OnPageChangeList
 
     private TextView mRegisterTv;
     private AutoCompleteTextView mEmailView;
+    private EditText mUserNameView;
     private EditText mPasswordView;
+    private EditText mRepasswordView ;
+    private EditText mPhoneView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,7 +142,7 @@ public class StartActivity extends AppCompatActivity implements OnPageChangeList
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                attemptLogin(true, view, ad);
+                attemptRegister(view, ad);
             }
         });
     }
@@ -151,7 +159,7 @@ public class StartActivity extends AppCompatActivity implements OnPageChangeList
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                attemptLogin(true, view, ad);
+                attemptLogin(view, ad);
             }
         });
 
@@ -215,9 +223,9 @@ public class StartActivity extends AppCompatActivity implements OnPageChangeList
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptLogin(boolean loginOrRegister, View view, final AlertDialog ad) {
+    private void attemptLogin(View view, final AlertDialog ad) {
 
-        mEmailView = (AutoCompleteTextView) view.findViewById(R.id.email);
+        mEmailView = (AutoCompleteTextView) view.findViewById(email);
 
         mPasswordView = (EditText) view.findViewById(R.id.password);
         // Reset errors.
@@ -226,7 +234,7 @@ public class StartActivity extends AppCompatActivity implements OnPageChangeList
 
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        final String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -259,7 +267,7 @@ public class StartActivity extends AppCompatActivity implements OnPageChangeList
 //            showProgress(true);
 //            mAuthTask = new UserLoginTask(email, password);
 //            mAuthTask.execute((Void) null);
-            if (loginOrRegister) {
+
                 AVUser.logInInBackground(email, password, new LogInCallback<AVUser>() {
                     @Override
                     public void done(AVUser avUser, AVException e) {
@@ -275,31 +283,147 @@ public class StartActivity extends AppCompatActivity implements OnPageChangeList
                         }
                         else {
                             ad.cancel();
+                            Log.d("StartActivity", avUser.toString());
                             Log.d("StartActivity", avUser.getEmail());
+                            Log.d("StartActivity", avUser.getObjectId());
+
+                            SharedPreferences sp = getSharedPreferences(getResources().getString(R.string.app_name), Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sp.edit();
+                            editor.putString("username",avUser.getUsername());
+                            editor.putString("email", avUser.getEmail());
+                            editor.putString("objectId", avUser.getObjectId());
+                            editor.putString("phoneNumber", avUser.getMobilePhoneNumber());
+                            editor.putString("password", password);
+                            editor.apply();
+
+                            Intent intent = new Intent();
+                            Bundle bundle = new Bundle();
+                            bundle.putString("username", avUser.getUsername());
+                            bundle.putString("email", avUser.getEmail());
+                            intent.putExtras(bundle);
+                            setResult(RESULT_OK, intent);
+                            finish();
                         }
 
                     }
                 });
-            }
-            else {
-                AVUser user = new AVUser();// 新建 AVUser 对象实例
-                user.setUsername(email);// 设置用户名
-                user.setPassword(password);// 设置密码
-                user.setEmail(email);// 设置邮箱
-                user.signUpInBackground(new SignUpCallback() {
-                    @Override
-                    public void done(AVException e) {
-                        if (e == null) {
-                            // 注册成功
-                            Toast.makeText(StartActivity.this, "Register success!", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(StartActivity.this, "Register error!", Toast.LENGTH_SHORT).show();
-                            // 失败的原因可能有多种，常见的是用户名已经存在。
+        }
+    }
+
+    private void attemptRegister( View view, final AlertDialog ad) {
+
+        mEmailView = (AutoCompleteTextView) view.findViewById(R.id.register_email_tx);
+        mPasswordView = (EditText) view.findViewById(R.id.register_password_tx);
+        mRepasswordView = (EditText) view.findViewById(R.id.register_re_password_tx);
+        mPhoneView = (EditText)view.findViewById(R.id.register_telephone_tx);
+        mUserNameView =  (EditText) view.findViewById(R.id.register_username_tx);
+
+        // Reset errors.
+        mEmailView.setError(null);
+        mPasswordView.setError(null);
+        mRepasswordView.setError(null);
+        mPhoneView.setError(null);
+        mUserNameView.setError(null);
+
+        String email = mEmailView.getText().toString();
+        final String password = mPasswordView.getText().toString();
+        String repassword = mRepasswordView.getText().toString();
+        String phone = mPhoneView.getText().toString();
+        String username = mUserNameView.getText().toString();
+
+        boolean cancel = false;
+        View focusView = null;
+
+        if (phone.length() != 11) {
+            mPhoneView.setError(getString(R.string.prompt_phone_error));
+            focusView = mPhoneView;
+            cancel = true;
+        }
+
+        if (!repassword.equals(password)) {
+            mRepasswordView.setError(getString(R.string.prompt_repassword_not_match));
+            focusView = mRepasswordView;
+            cancel = true;
+        }
+
+        // Check for a valid password, if the user entered one.
+        if (TextUtils.isEmpty(repassword) || !isPasswordValid(repassword)) {
+            mRepasswordView.setError(getString(R.string.error_invalid_password));
+            focusView = mRepasswordView;
+            cancel = true;
+        }
+
+        if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
+            mPasswordView.setError(getString(R.string.error_invalid_password));
+            focusView = mPasswordView;
+            cancel = true;
+        }
+
+        // Check for a valid email address.
+        if (TextUtils.isEmpty(email)) {
+            mEmailView.setError(getString(R.string.error_field_required));
+            focusView = mEmailView;
+            cancel = true;
+        } else if (!isEmailValid(email)) {
+            mEmailView.setError(getString(R.string.error_invalid_email));
+            focusView = mEmailView;
+            cancel = true;
+        }
+
+        if (TextUtils.isEmpty(username)) {
+            mUserNameView.setError(getString(R.string.error_field_required));
+            focusView = mUserNameView;
+            cancel = true;
+        }
+
+        if (cancel) {
+            // There was an error; don't attempt login and focus the first
+            // form field with an error.
+            focusView.requestFocus();
+        } else {
+            final AVUser user = new AVUser();// 新建 AVUser 对象实例
+            user.setUsername(username);// 设置用户名
+            user.setPassword(password);// 设置密码
+            user.setEmail(email);// 设置邮箱
+            user.setMobilePhoneNumber(phone);
+            user.signUpInBackground(new SignUpCallback() {
+                @Override
+                public void done(AVException e) {
+                    if (e == null) {
+                        // 注册成功
+                        Toast.makeText(StartActivity.this, "Register success!", Toast.LENGTH_SHORT).show();
+                        ad.cancel();
+
+                        SharedPreferences sp = getSharedPreferences(getResources().getString(R.string.app_name), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sp.edit();
+                        editor.putString("username",user.getUsername());
+                        editor.putString("email", user.getEmail());
+                        editor.putString("objectId", user.getObjectId());
+                        editor.putString("phoneNumber", user.getMobilePhoneNumber());
+                        editor.putString("password", password);
+                        editor.apply();
+
+                        Intent intent = new Intent();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("username", user.getUsername());
+                        bundle.putString("email", user.getEmail());
+                        intent.putExtras(bundle);
+                        setResult(RESULT_OK, intent);
+
+                        finish();
+
+                    } else {
+                        // 失败的原因可能有多种，常见的是用户名已经存在。
+                        Log.d("StartActivity", e.toString());
+                        if (e.getCode() == 203) {
+                            Toast.makeText(StartActivity.this, "user name has existed", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Toast.makeText(StartActivity.this, "register error!\r\nmessage: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
-                });
-            }
-
+                }
+            });
         }
     }
 
