@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,15 +46,15 @@ public class MainActivity extends AppCompatActivity
 
     private TextView mUserNameView;
     private TextView mEmailView;
+    private TextView cityTextView;
     private ImageView imageView;
+    private LinearLayout searchLinearLayout;
 
     private MapView mMapView = null;
     private AMap aMap;
     private OnLocationChangedListener mListener;
     private AMapLocationClient mlocationClient;
     private AMapLocationClientOption mLocationOption;
-
-    private boolean isLocated = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +87,19 @@ public class MainActivity extends AppCompatActivity
         mEmailView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.email_textView);
         imageView = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
 
+        cityTextView = (TextView)findViewById(R.id.city_text);
+        searchLinearLayout = (LinearLayout)findViewById(R.id.search_btn);
+        searchLinearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "onclick", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(MainActivity.this, MySearchActivity.class);
+                startActivityForResult(intent, 0);
+            }
+        });
+
+
         SharedPreferences sp = getSharedPreferences(getResources().getString(R.string.app_name), Context.MODE_PRIVATE);
 
         String email = sp.getString("username", "null");
@@ -115,20 +129,20 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-
         //获取地图控件引用
         mMapView = (MapView) findViewById(R.id.map);
         //在activity执行onCreate时执行mMapView.onCreate(savedInstanceState)，实现地图生命周期管理
         mMapView.onCreate(savedInstanceState);
         mapInit();
+
     }
 
     private void mapInit() {
         if (aMap == null) {
             aMap = mMapView.getMap();
             UiSettings settings = aMap.getUiSettings();
-            settings.setZoomPosition(1);
-
+//            settings.setZoomPosition(1);
+            settings.setZoomControlsEnabled(false);
             setUpMap();
         }
     }
@@ -140,14 +154,14 @@ public class MainActivity extends AppCompatActivity
         // 自定义系统定位小蓝点
         MyLocationStyle myLocationStyle = new MyLocationStyle();
         myLocationStyle.myLocationIcon(BitmapDescriptorFactory
-                .fromResource(R.drawable.location_marker));// 设置小蓝点的图标
+                .fromResource(R.drawable.ic_room_black_24dp));// 设置小蓝点的图标
         myLocationStyle.strokeColor(Color.BLACK);// 设置圆形的边框颜色
         myLocationStyle.radiusFillColor(Color.argb(100, 0, 0, 180));// 设置圆形的填充颜色
         // myLocationStyle.anchor(int,int)//设置小蓝点的锚点
         myLocationStyle.strokeWidth(1.0f);// 设置圆形的边框粗细
         aMap.setMyLocationStyle(myLocationStyle);
         aMap.setLocationSource(this);// 设置定位监听
-        aMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
+        aMap.getUiSettings().setMyLocationButtonEnabled(false);// 设置默认定位按钮是否显示
         aMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
         // aMap.setMyLocationType()
     }
@@ -256,9 +270,11 @@ public class MainActivity extends AppCompatActivity
                 mListener.onLocationChanged(amapLocation);// 显示系统小蓝点
                 Log.d("MainActivity", amapLocation.getAddress());
                 aMap.moveCamera(CameraUpdateFactory.zoomTo(17));
-                mlocationClient.stopLocation();
+                cityTextView.setText(amapLocation.getCity());
+                mlocationClient.onDestroy();
             } else {
                 String errText = "定位失败," + amapLocation.getErrorCode()+ ": " + amapLocation.getErrorInfo();
+                cityTextView.setText("定位失败");
                 Log.e("AmapErr",errText);
             }
         }

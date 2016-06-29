@@ -20,7 +20,7 @@ android {
     buildToolsVersion "23.0.2"
     defaultConfig {
         applicationId "app.example.com.leancloud"
-        minSdkVersion 14
+        minSdkVersion 21
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
