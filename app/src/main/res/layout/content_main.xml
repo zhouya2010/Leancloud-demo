@@ -49,8 +49,9 @@
             android:background="@drawable/ic_search_black_24dp"/>
 
         <TextView
+            android:id="@+id/search_content_text"
             android:layout_gravity="center"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="你想去哪~"
             android:textSize="16sp"/>
