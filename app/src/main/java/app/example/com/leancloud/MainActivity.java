@@ -33,14 +33,20 @@ import com.amap.api.maps2d.LocationSource;
 import com.amap.api.maps2d.MapView;
 import com.amap.api.maps2d.UiSettings;
 import com.amap.api.maps2d.model.BitmapDescriptorFactory;
+import com.amap.api.maps2d.model.LatLng;
 import com.amap.api.maps2d.model.Marker;
 import com.amap.api.maps2d.model.MarkerOptions;
 import com.amap.api.maps2d.model.MyLocationStyle;
-import com.amap.api.maps2d.overlay.PoiOverlay;
+import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.core.PoiItem;
 import com.amap.api.services.core.SuggestionCity;
 import com.amap.api.services.poisearch.PoiResult;
 import com.amap.api.services.poisearch.PoiSearch;
+import com.amap.api.services.route.BusRouteResult;
+import com.amap.api.services.route.DrivePath;
+import com.amap.api.services.route.DriveRouteResult;
+import com.amap.api.services.route.RouteSearch;
+import com.amap.api.services.route.WalkRouteResult;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.LogInCallback;
@@ -50,11 +56,15 @@ import org.json.JSONException;
 
 import java.util.List;
 
+import app.example.com.leancloud.route.MyDrivingRouteOverlay;
+import app.example.com.leancloud.route.MyPoiOverlay;
+import app.example.com.leancloud.util.AMapUtil;
 import app.example.com.leancloud.util.ToastUtil;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LocationSource,
-        AMapLocationListener, PoiSearch.OnPoiSearchListener, AMap.OnMarkerClickListener,AMap.InfoWindowAdapter {
+        AMapLocationListener, PoiSearch.OnPoiSearchListener, AMap.OnMarkerClickListener,
+        AMap.InfoWindowAdapter, RouteSearch.OnRouteSearchListener {
 
     private TextView mUserNameView;
     private TextView mEmailView;
@@ -64,6 +74,8 @@ public class MainActivity extends AppCompatActivity
     private LinearLayout searchLinearLayout;
     private LinearLayout myLocationBtn;
 
+    private boolean isLocated = false;
+
     private MapView mMapView = null;
     private AMap aMap;
     private OnLocationChangedListener mListener;
@@ -71,6 +83,8 @@ public class MainActivity extends AppCompatActivity
     private AMapLocationClientOption mLocationOption;
     private MarkerOptions markerOption;
     private AMapLocation myAmapLocation;
+    private MyPoiOverlay poiOverlay;//搜索marker
+    MyDrivingRouteOverlay drivingRouteOverlay;//路径marker
 
     private PoiSearch.Query query;// Poi查询条件类
     private PoiSearch poiSearch;// POI搜索
@@ -81,6 +95,12 @@ public class MainActivity extends AppCompatActivity
 
     private ProgressDialog progDialog = null;// 搜索时进度条
 
+    private LatLonPoint mStartPoint = new LatLonPoint(39.917636, 116.397743);//起点，
+    private LatLonPoint mEndPoint = new LatLonPoint(39.984947, 116.494689);//终点，
+
+    private RouteSearch mRouteSearch;
+    private DriveRouteResult mDriveRouteResult;
+
     public static final int REQUESTCODE_LONGIN_ACTIVITY = 0;
     public static final int REQUESTCODE_SEARCH_ACTIVITY = 1;
 
@@ -88,7 +108,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -136,7 +156,6 @@ public class MainActivity extends AppCompatActivity
         AVUser.logInInBackground(email, password, new LogInCallback<AVUser>() {
             @Override
             public void done(AVUser avUser, AVException e) {
-
                 if (e != null) {
                     if (e.getCode() == 211) {
                         Toast.makeText(MainActivity.this, R.string.user_name_not_exist, Toast.LENGTH_SHORT).show();
@@ -167,13 +186,19 @@ public class MainActivity extends AppCompatActivity
         myLocationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (mListener != null && myAmapLocation != null) {
-                    if (myAmapLocation.getErrorCode() == 0) {
-//                        showMyLocation(myAmapLocation);
-                        Toast.makeText(MainActivity.this, "click myLocationBtn", Toast.LENGTH_SHORT).show();
-                    }
+//                Intent intent = new Intent(MainActivity.this, RouteActivity.class);
+//                startActivityForResult(intent, 0);
+                if (poiOverlay != null) {
+                    poiOverlay.removeFromMap();
+                    poiOverlay = null;
                 }
+
+                if (drivingRouteOverlay != null) {
+                    drivingRouteOverlay.removeFromMap();
+                    drivingRouteOverlay = null;
+                }
+
+                aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(myAmapLocation.getLatitude(), myAmapLocation.getLongitude()), 17));
             }
         });
     }
@@ -182,10 +207,20 @@ public class MainActivity extends AppCompatActivity
         if (aMap == null) {
             aMap = mMapView.getMap();
             UiSettings settings = aMap.getUiSettings();
-//            settings.setZoomPosition(1);
             settings.setZoomControlsEnabled(false);
             setUpMap();
+            mRouteSearch = new RouteSearch(this);
+            mRouteSearch.setRouteSearchListener(this);
         }
+    }
+
+    private void setfromandtoMarker() {
+        aMap.addMarker(new MarkerOptions()
+                .position(AMapUtil.convertToLatLng(mStartPoint))
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.start)));
+        aMap.addMarker(new MarkerOptions()
+                .position(AMapUtil.convertToLatLng(mEndPoint))
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.end)));
     }
 
     /**
@@ -208,19 +243,6 @@ public class MainActivity extends AppCompatActivity
         // aMap.setMyLocationType()
         aMap.setOnMarkerClickListener(this);
         aMap.setInfoWindowAdapter(this);
-
-        markerOption = new MarkerOptions();
-//        markerOption.position(Constants.XIAN);
-//        markerOption.title("西安市").snippet("西安市：34.341568, 108.940174");
-//        markerOption.draggable(true);
-        markerOption.icon(BitmapDescriptorFactory
-                .fromResource(R.drawable.ic_directions_car_black_24dp));
-        aMap.addMarker(markerOption);
-
-//        Marker marker2 = aMap.addMarker(markerOption);
-//        marker2.showInfoWindow();
-//        // marker旋转90度
-//        marker2.setRotateAngle(90);
     }
 
     @Override
@@ -357,8 +379,8 @@ public class MainActivity extends AppCompatActivity
                     List<SuggestionCity> suggestionCities = poiResult
                             .getSearchSuggestionCitys();// 当搜索不到poiitem数据时，会返回含有搜索关键字的城市信息
                     if (poiItems != null && poiItems.size() > 0) {
-                        aMap.clear();
-                        PoiOverlay poiOverlay = new PoiOverlay(aMap, poiItems);
+//                        aMap.clear();
+                        poiOverlay = new MyPoiOverlay(this, aMap, poiItems);
                         poiOverlay.removeFromMap();
                         poiOverlay.addToMap();
                         poiOverlay.zoomToSpan();
@@ -384,9 +406,10 @@ public class MainActivity extends AppCompatActivity
         if (mListener != null && amapLocation != null) {
             if (amapLocation.getErrorCode() == 0) {
                 myAmapLocation = amapLocation;
+                mStartPoint.setLatitude(amapLocation.getLatitude());
+                mStartPoint.setLongitude(amapLocation.getLongitude());
                 showMyLocation(amapLocation);
-            }
-            else {
+            } else {
                 String errText = "定位失败," + amapLocation.getErrorCode() + ": " + amapLocation.getErrorInfo();
                 cityTextView.setText("定位失败");
                 Log.e("AmapErr", errText);
@@ -397,9 +420,13 @@ public class MainActivity extends AppCompatActivity
     private void showMyLocation(AMapLocation amapLocation) {
         mListener.onLocationChanged(amapLocation);// 显示系统小蓝点
         Log.d("MainActivity", amapLocation.getAddress());
-        aMap.moveCamera(CameraUpdateFactory.zoomTo(17));
+        if (!isLocated) {
+            aMap.moveCamera(CameraUpdateFactory.zoomTo(17));
+            isLocated = true;
+        }
+
         cityTextView.setText(amapLocation.getCity());
-                mlocationClient.onDestroy();
+        mlocationClient.onDestroy();
     }
 
     /**
@@ -413,6 +440,7 @@ public class MainActivity extends AppCompatActivity
             mLocationOption = new AMapLocationClientOption();
             //设置定位监听
             mlocationClient.setLocationListener(this);
+            mLocationOption.setInterval(10 * 1000);
             //设置为高精度定位模式
             mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
             //设置定位参数
@@ -478,7 +506,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public View getInfoWindow(Marker marker) {
+    public View getInfoWindow(final Marker marker) {
         Log.e("MainActivity", "getInfoWindow");
         View view = getLayoutInflater().inflate(R.layout.marker_item, null);
         TextView title = (TextView) view.findViewById(R.id.marker_title);
@@ -490,6 +518,9 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Log.d("MainActivity", "Img onClick");
+                LatLng p = marker.getPosition();
+                mEndPoint = AMapUtil.convertToLatLonPoint(marker.getPosition());
+                searchRouteResult(0,RouteSearch.DrivingDefault);
             }
         });
         return view;
@@ -498,5 +529,57 @@ public class MainActivity extends AppCompatActivity
     @Override
     public View getInfoContents(Marker marker) {
         return null;
+    }
+
+    private void searchRouteResult(int routeType, int mode) {
+        if (mStartPoint == null) {
+            ToastUtil.show(this, "定位中，稍后再试...");
+            return;
+        }
+        if (mEndPoint == null) {
+            ToastUtil.show(this, "终点未设置");
+        }
+        showProgressDialog();
+        final RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(
+                mStartPoint, mEndPoint);//设置起点和终点
+        RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(fromAndTo, mode, null,
+                null, "");
+        mRouteSearch.calculateDriveRouteAsyn(query);// 异步路径规划驾车模式查询
+    }
+
+    @Override
+    public void onBusRouteSearched(BusRouteResult result, int errorCode) {
+
+    }
+
+    @Override
+    public void onDriveRouteSearched(DriveRouteResult result, int errorCode) {
+        dissmissProgressDialog();
+//        aMap.clear();// 清理地图上的所有覆盖物
+        if (errorCode == 1000) {
+            if (result != null && result.getPaths() != null) {
+                if (result.getPaths().size() > 0) {
+                    mDriveRouteResult = result;
+                    DrivePath drivePath = mDriveRouteResult.getPaths()
+                            .get(0);
+                    drivingRouteOverlay = new MyDrivingRouteOverlay(
+                            this, aMap, drivePath,
+                            mDriveRouteResult.getStartPos(),
+                            mDriveRouteResult.getTargetPos());
+                    drivingRouteOverlay.removeFromMap();
+                    drivingRouteOverlay.addToMap();
+                    drivingRouteOverlay.zoomToSpan();
+                }
+            } else {
+                ToastUtil.show(this, R.string.no_result);
+            }
+        } else {
+            ToastUtil.showerror(this.getApplicationContext(), errorCode);
+        }
+    }
+
+    @Override
+    public void onWalkRouteSearched(WalkRouteResult walkRouteResult, int i) {
+
     }
 }

@@ -52,6 +52,7 @@
 
         <activity android:name=".PoiKeywordSearchActivity"/>
         <activity android:name=".MySearchActivity"/>
+        <activity android:name=".route.RouteActivity"/>
 
         <service android:name="com.amap.api.location.APSService"></service>
     </application>

@@ -289,8 +289,6 @@
     <!-- 绿色 -->
     <color name="darkgreen">#006400</color>
     <!-- 暗绿色 -->
-    <color name="blue">#0000ff</color>
-    <!-- 蓝色 -->
     <color name="mediumblue">#0000cd</color>
     <!-- 中兰色 -->
     <color name="darkblue">#00008b</color>
@@ -307,4 +305,13 @@
     <!-- 40白色 -->
     <color name="transparent">#00000000</color>
     <!-- 透明 -->
+
+    <color name="darkgrey"> #999999</color>
+    <color name="gary">#898989</color>
+    <color name="gray_lite">#c5c5c5</color>
+    <color name="phone_bg">#f6f6f6</color>
+    <color name="itemlist">#f4f4f4</color>
+    <color name="watermark_hint">#ccffffff</color>
+    <color name="act_background">#efefef</color>
+    <color name="blue">#4c90f9</color>
 </resources>
