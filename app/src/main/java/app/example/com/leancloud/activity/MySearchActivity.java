@@ -1,4 +1,4 @@
-package app.example.com.leancloud;
+package app.example.com.leancloud.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import app.example.com.leancloud.R;
 import app.example.com.leancloud.util.AMapUtil;
 
 /**

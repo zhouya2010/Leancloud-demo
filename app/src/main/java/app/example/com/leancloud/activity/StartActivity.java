@@ -1,4 +1,4 @@
-package app.example.com.leancloud;
+package app.example.com.leancloud.activity;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -28,6 +28,8 @@ import com.avos.avoscloud.SignUpCallback;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import app.example.com.leancloud.R;
 
 import static app.example.com.leancloud.R.id.email;
 

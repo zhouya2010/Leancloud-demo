@@ -56,15 +56,19 @@ import org.json.JSONException;
 
 import java.util.List;
 
+import app.example.com.leancloud.activity.MySearchActivity;
+import app.example.com.leancloud.activity.StartActivity;
+import app.example.com.leancloud.activity.UserInfoActivity;
 import app.example.com.leancloud.route.MyDrivingRouteOverlay;
 import app.example.com.leancloud.route.MyPoiOverlay;
+import app.example.com.leancloud.temp.CardViewTestActivity;
 import app.example.com.leancloud.util.AMapUtil;
 import app.example.com.leancloud.util.ToastUtil;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LocationSource,
         AMapLocationListener, PoiSearch.OnPoiSearchListener, AMap.OnMarkerClickListener,
-        AMap.InfoWindowAdapter, RouteSearch.OnRouteSearchListener {
+        AMap.InfoWindowAdapter, RouteSearch.OnRouteSearchListener, View.OnClickListener {
 
     private TextView mUserNameView;
     private TextView mEmailView;
@@ -120,6 +124,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -134,22 +139,15 @@ public class MainActivity extends AppCompatActivity
         mUserNameView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.user_name_textView);
         mEmailView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.email_textView);
         imageView = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
+        imageView.setOnClickListener(this);
 
         cityTextView = (TextView) findViewById(R.id.city_text);
         searchLinearLayout = (LinearLayout) findViewById(R.id.search_btn);
-        searchLinearLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, MySearchActivity.class);
-//                Intent intent = new Intent(MainActivity.this, PoiKeywordSearchActivity.class);
-                startActivityForResult(intent, REQUESTCODE_SEARCH_ACTIVITY);
-            }
-        });
+        searchLinearLayout.setOnClickListener(this);
 
         searchTextView = (TextView) findViewById(R.id.search_content_text);
 
         SharedPreferences sp = getSharedPreferences(getResources().getString(R.string.app_name), Context.MODE_PRIVATE);
-
         String email = sp.getString("username", "null");
         String password = sp.getString("password", "null");
 
@@ -286,9 +284,9 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_camera) {
             // Handle the camera action
             Snackbar.make(mMapView, "Camera", Snackbar.LENGTH_SHORT).show();
-            aMap.moveCamera(CameraUpdateFactory.zoomTo(19));
         } else if (id == R.id.nav_gallery) {
-            aMap.moveCamera(CameraUpdateFactory.zoomTo(5));
+            Intent intent = new Intent(MainActivity.this, CardViewTestActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
@@ -581,5 +579,28 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onWalkRouteSearched(WalkRouteResult walkRouteResult, int i) {
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.imageView:
+                startUserInfoActivity();
+                break;
+
+            case R.id.search_btn:
+                startMySearchActivity();
+                break;
+        }
+    }
+
+    private void startMySearchActivity() {
+        Intent intent = new Intent(MainActivity.this, MySearchActivity.class);
+        startActivityForResult(intent, REQUESTCODE_SEARCH_ACTIVITY);
+    }
+
+    private void startUserInfoActivity() {
+        Intent intent = new Intent(MainActivity.this, UserInfoActivity.class);
+        startActivity(intent);
     }
 }

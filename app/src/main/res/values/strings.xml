@@ -177,4 +177,10 @@
     <string name="report_time">发布时间</string>
     <string name="sydney">悉尼</string>
     <string name="beijing">北京</string>
+    <string name="head">头像</string>
+    <string name="user_info">用户信息</string>
+    <string name="nick_name">昵称</string>
+    <string name="user_name">用户名</string>
+    <string name="email">邮箱</string>
+    <string name="telephone">手机号</string>
 </resources>

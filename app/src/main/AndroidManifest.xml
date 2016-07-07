@@ -30,10 +30,10 @@
         android:theme="@style/AppTheme">
         <meta-data android:name="com.amap.api.v2.apikey" android:value="9ea5d7bccd06bd32b803f378105533f6"></meta-data>
         <activity
-            android:name=".LoginActivity"
+            android:name=".activity.LoginActivity"
             android:label="@string/app_name" />
         <activity
-            android:name=".StartActivity"
+            android:name=".activity.StartActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/app_name"
             android:theme="@style/Theme.AppCompat.NoActionBar">
@@ -50,9 +50,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".PoiKeywordSearchActivity"/>
-        <activity android:name=".MySearchActivity"/>
-        <activity android:name=".route.RouteActivity"/>
+        <activity android:name=".activity.MySearchActivity"/>
+        <activity android:name=".activity.UserInfoActivity" />
+        <activity android:name=".temp.CardViewTestActivity"/>
 
         <service android:name="com.amap.api.location.APSService"></service>
     </application>

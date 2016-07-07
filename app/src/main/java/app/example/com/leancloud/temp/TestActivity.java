@@ -1,4 +1,4 @@
-package app.example.com.leancloud;
+package app.example.com.leancloud.temp;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+
+import app.example.com.leancloud.R;
 
 public class TestActivity extends AppCompatActivity {
 

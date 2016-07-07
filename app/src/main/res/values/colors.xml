@@ -5,6 +5,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="white">#FFFFFF</color>
     <color name="black_overlay">#66000000</color>
+    <color name="black_overlay_more">#36000000</color>
 
     <color name="whitebg">#7fffffff</color>
     <!-- 半透明白色 -->

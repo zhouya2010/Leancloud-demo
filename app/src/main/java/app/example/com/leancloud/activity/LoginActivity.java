@@ -1,4 +1,4 @@
-package app.example.com.leancloud;
+package app.example.com.leancloud.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -32,6 +32,8 @@ import com.avos.avoscloud.SignUpCallback;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import app.example.com.leancloud.R;
 
 import static android.Manifest.permission.READ_CONTACTS;
 import static app.example.com.leancloud.R.id.login_form;
