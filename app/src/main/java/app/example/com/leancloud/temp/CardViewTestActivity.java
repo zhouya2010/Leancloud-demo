@@ -1,14 +1,17 @@
 package app.example.com.leancloud.temp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
@@ -30,23 +33,25 @@ public class CardViewTestActivity extends AppCompatActivity {
 
         initData();
         mRecyclerView = (RecyclerView) findViewById(R.id.id_recyclerview);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 4));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 4));
 //        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.HORIZONTAL));
-        mRecyclerView.addItemDecoration(new DividerGridItemDecoration(this));
+//        mRecyclerView.addItemDecoration(new DividerGridItemDecoration(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mAdapter = new HomeAdapter();
         mRecyclerView.setAdapter(mAdapter);
     }
 
     private void initEvent() {
-
+        Intent intent = new Intent();
     }
 
     protected void initData() {
         mDatas = new ArrayList<String>();
-        for (int i = 'A'; i < 'z'; i++) {
-            mDatas.add("" + (char) i);
-        }
+        mDatas.add(""+ 1 + " 赞同");
+//        for (int i = 'A'; i < 'z'; i++) {
+//            mDatas.add("" + (char) i);
+//        }
     }
 
     @Override
@@ -79,14 +84,20 @@ public class CardViewTestActivity extends AppCompatActivity {
         @Override
         public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             MyViewHolder holder = new MyViewHolder(LayoutInflater.from(
-                    CardViewTestActivity.this).inflate(R.layout.item, parent,
+                    CardViewTestActivity.this).inflate(R.layout.my_card_view, parent,
                     false));
             return holder;
         }
 
         @Override
-        public void onBindViewHolder(MyViewHolder holder, int position) {
-            holder.textView.setText(mDatas.get(position));
+        public void onBindViewHolder( MyViewHolder holder, final int position) {
+            holder.gree_num.setText(mDatas.get(position));
+            holder. join_text.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("HomeAdapter", "click join " + position);
+                }
+            });
         }
 
         @Override
@@ -95,7 +106,7 @@ public class CardViewTestActivity extends AppCompatActivity {
         }
 
         public void addData(int position) {
-            mDatas.add(position, "Insert One");
+            mDatas.add(position, ""+(mDatas.size() + 1) + " 赞同");
             notifyItemInserted(position);
         }
 
