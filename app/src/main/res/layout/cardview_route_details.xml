@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/text_margin_top"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/head_imageview"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/scenery1"/>
+
+            <LinearLayout
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/usr_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:text="摩尔克斯"/>
+
+                <TextView
+                    android:id="@+id/age"
+                    style="@style/UserSimpleTitle"
+                    android:text="80后 . 金融类"/>
+
+                <TextView
+                    android:id="@+id/car_name"
+                    style="@style/UserSimpleTitle"
+                    android:text="雪佛兰科鲁兹"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/text_margin_top"
+            android:background="@drawable/linearlayout_style"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/ic_album_black_24dp"/>
+
+                <TextView
+                    android:id="@+id/start_point"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/text_margin_top"
+                    android:textColor="@color/black"
+                    android:text="南大仙林校区"/>
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="@dimen/text_margin_top">
+
+                <TextView
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/ic_album_red_24dp"/>
+
+                <TextView
+                    android:id="@+id/end_point"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/text_margin_top"
+                    android:textColor="@color/black"
+                    android:text="1865科技创意园"/>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/start_time"
+                android:layout_marginTop="@dimen/text_margin_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="出发时间：08:30"/>
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

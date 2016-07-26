@@ -7,12 +7,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,20 +84,22 @@ public class CardViewTestActivity extends AppCompatActivity {
         @Override
         public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             MyViewHolder holder = new MyViewHolder(LayoutInflater.from(
-                    CardViewTestActivity.this).inflate(R.layout.my_card_view, parent,
+                    CardViewTestActivity.this).inflate(R.layout.cardview_route_details, parent,
                     false));
             return holder;
         }
 
         @Override
-        public void onBindViewHolder( MyViewHolder holder, final int position) {
-            holder.gree_num.setText(mDatas.get(position));
-            holder. join_text.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d("HomeAdapter", "click join " + position);
-                }
-            });
+        public void onBindViewHolder( MyViewHolder holder, int position) {
+//            holder.start_time_text.setText(mDatas.get(position));
+//            holder. end_point_text.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Log.d("HomeAdapter", "click join " + position);
+//                }
+//            });
+
+            Picasso.with(CardViewTestActivity.this).load(R.drawable.scenery1).transform(new CircleTransform()).resize(70,70).into(holder.head_img);
         }
 
         @Override

@@ -14,23 +14,17 @@ import app.example.com.leancloud.R;
 public class MyViewHolder extends RecyclerView.ViewHolder {
 
     ImageView head_img;
-    ImageView content_img;
-    TextView pub_time;
-    TextView join_text;
-    TextView gree_num;
+    TextView start_point_text;
+    TextView end_point_text;
+    TextView start_time_text;
+    TextView usr_mane_text;
 
     public MyViewHolder(View itemView) {
         super(itemView);
-        pub_time = (TextView) itemView.findViewById(R.id.pub_time);
-        join_text = (TextView) itemView.findViewById(R.id.jone_text);
-        gree_num = (TextView) itemView.findViewById(R.id.gree_num);
-        head_img = (ImageView) itemView.findViewById(R.id.head_img);
-        content_img = (ImageView) itemView.findViewById(R.id.content_img);
-//        join_text.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.d("HomeAdapter", "click join ");
-//            }
-//        });
+        start_point_text = (TextView) itemView.findViewById(R.id.start_point);
+        end_point_text = (TextView) itemView.findViewById(R.id.end_point);
+        start_time_text = (TextView) itemView.findViewById(R.id.start_time);
+        usr_mane_text = (TextView) itemView.findViewById(R.id.user_name_text);
+        head_img = (ImageView) itemView.findViewById(R.id.head_imageview);
     }
 }

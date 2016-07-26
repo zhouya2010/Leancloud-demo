@@ -20,8 +20,8 @@ android {
     buildToolsVersion "23.0.2"
     defaultConfig {
         applicationId "app.example.com.leancloud"
-        minSdkVersion 21
-        targetSdkVersion 23
+        minSdkVersion 19
+        targetSdkVersion 19
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

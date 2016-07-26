@@ -58,7 +58,7 @@ import java.util.List;
 
 import app.example.com.leancloud.activity.MySearchActivity;
 import app.example.com.leancloud.activity.StartActivity;
-import app.example.com.leancloud.activity.UserInfoActivity;
+import app.example.com.leancloud.activity.UserInfoActivityImpl;
 import app.example.com.leancloud.route.MyDrivingRouteOverlay;
 import app.example.com.leancloud.route.MyPoiOverlay;
 import app.example.com.leancloud.temp.CardViewTestActivity;
@@ -354,7 +354,7 @@ public class MainActivity extends AppCompatActivity
         showProgressDialog();// 显示进度框
         currentPage = 0;
         query = new PoiSearch.Query(keyWord, "", district);
-        query.setPageSize(5);
+        query.setPageSize(1);
         query.setPageNum(currentPage);
         query.setCityLimit(true);
 
@@ -586,6 +586,7 @@ public class MainActivity extends AppCompatActivity
         switch (v.getId()) {
             case R.id.imageView:
                 startUserInfoActivity();
+                Log.d("MainActivity", "startUserInfoActivity");
                 break;
 
             case R.id.search_btn:
@@ -600,7 +601,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void startUserInfoActivity() {
-        Intent intent = new Intent(MainActivity.this, UserInfoActivity.class);
+        Intent intent = new Intent(MainActivity.this, UserInfoActivityImpl.class);
         startActivity(intent);
     }
 }

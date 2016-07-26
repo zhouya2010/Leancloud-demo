@@ -52,6 +52,7 @@
 
         <activity android:name=".activity.MySearchActivity"/>
         <activity android:name=".activity.UserInfoActivity" />
+        <activity android:name=".activity.UserInfoActivityImpl" />
         <activity android:name=".temp.CardViewTestActivity"/>
 
         <service android:name="com.amap.api.location.APSService"></service>
