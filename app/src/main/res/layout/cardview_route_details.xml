@@ -20,6 +20,7 @@
                 android:id="@+id/head_imageview"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
+                android:clickable="true"
                 android:src="@drawable/scenery1"/>
 
             <LinearLayout
