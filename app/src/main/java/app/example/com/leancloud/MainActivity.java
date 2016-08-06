@@ -51,6 +51,8 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.LogInCallback;
 import com.squareup.picasso.Picasso;
+import com.uuzuche.lib_zxing.activity.CaptureActivity;
+import com.uuzuche.lib_zxing.activity.CodeUtils;
 
 import org.json.JSONException;
 
@@ -107,6 +109,7 @@ public class MainActivity extends AppCompatActivity
 
     public static final int REQUESTCODE_LONGIN_ACTIVITY = 0;
     public static final int REQUESTCODE_SEARCH_ACTIVITY = 1;
+    public static final int REQUESTCODE_CAPTURE_ACTIVITY = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -272,6 +275,11 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
 
+        if (id == R.id.action_zxing) {
+            Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
+            startActivityForResult(intent, REQUESTCODE_CAPTURE_ACTIVITY);
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -346,6 +354,22 @@ public class MainActivity extends AppCompatActivity
             } else {
                 searchTextView.setText(keyWord);
                 doSearchQuery();
+            }
+        }
+        else if (resultCode == RESULT_OK && requestCode == REQUESTCODE_CAPTURE_ACTIVITY) {
+            //处理扫描结果（在界面上显示）
+            if (null != data) {
+                Bundle bundle = data.getExtras();
+                if (bundle == null) {
+                    return;
+                }
+                if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
+                    String result = bundle.getString(CodeUtils.RESULT_STRING);
+                    Toast.makeText(this, "解析结果:" + result, Toast.LENGTH_LONG).show();
+                    Log.d("MainActivity", "解析结果:" + result);
+                } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
+                    Toast.makeText(MainActivity.this, "解析二维码失败", Toast.LENGTH_LONG).show();
+                }
             }
         }
     }

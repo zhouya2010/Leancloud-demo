@@ -6,4 +6,10 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_zxing"
+        android:title="@string/action_zxing"
+        android:icon="@drawable/ic_aspect_ratio_black"
+        app:showAsAction="ifRoom"
+        />
 </menu>

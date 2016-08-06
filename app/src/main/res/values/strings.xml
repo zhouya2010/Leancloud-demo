@@ -28,6 +28,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="action_zxing">扫一扫</string>
 
     <string name="animate">Animate</string>
     <string name="basic_map">基本地图</string>
