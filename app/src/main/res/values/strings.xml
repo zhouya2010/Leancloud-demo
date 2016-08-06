@@ -186,4 +186,6 @@
 
 
     <string name="public_time">昨天发布</string>
+    <string name="start_point_tips">出发地点</string>
+    <string name="end_point_tips">目的地</string>
 </resources>

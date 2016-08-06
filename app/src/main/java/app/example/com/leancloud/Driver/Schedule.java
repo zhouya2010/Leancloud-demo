@@ -8,10 +8,19 @@ import java.util.Date;
 
 public class Schedule {
 
+    //出发位置
     private String mStartPoint;
+
+    //结束位置
     private String mEndPoint;
+
+    //出发时间
     private Date mGoTime;
+
+    //身份 顾客或司机
     private boolean mIdentity;
+
+    //发布状态
     private boolean mPubStatus;
 
     public final static boolean Driver = true;
